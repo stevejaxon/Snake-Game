@@ -7,9 +7,7 @@ Renderer::Renderer(const std::size_t screen_width,
                    const std::size_t grid_width, const std::size_t grid_height)
     : screen_width(screen_width), screen_height(screen_height),
       grid_width(grid_width), grid_height(grid_height), 
-      num_horizontal_grid_lines(screen_height / grid_height),
-      num_vertical_grid_lines(screen_width / grid_width),
-      total_num_grid_lines((num_horizontal_grid_lines + num_vertical_grid_lines) * 2) {
+      total_num_rect_in_grid((screen_width / grid_width) * (screen_height / grid_height)) {
   // Initialize SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     std::cerr << "SDL could not initialize.\n";
@@ -40,21 +38,23 @@ Renderer::Renderer(const std::size_t screen_width,
 Renderer::~Renderer() {
   SDL_DestroyWindow(sdl_window);
   SDL_Quit();
+  delete[] grid_rectangles;
 }
 
 void Renderer::InitGrid(const int screen_width, const int screen_height,
                         const int grid_width, const int grid_height) {
-  SDL_Point* gridPoints = new SDL_Point[total_num_grid_lines];
-  for (int i = 0; i < num_horizontal_grid_lines; ++i) {
-    gridPoints[i * 2] = {0, i * grid_height}; // Horizontal line start
-    gridPoints[i * 2 + 1] = {screen_width, i * grid_height}; // Horizontal line end
+  SDL_Rect* gridRects = new SDL_Rect[total_num_rect_in_grid];
+  int columnsInRow = screen_width / grid_width;
+  int rowsInGrid = screen_height / grid_height;
+  for (int i = 0; i < rowsInGrid; i++) {
+    for (int j = 0; j < columnsInRow; j++) {
+      int index = (i * columnsInRow) + j;
+      int x = grid_width * j;
+      int y = grid_height * i;
+      gridRects[index] = SDL_Rect{x, y, grid_width, grid_height};
+    }
   }
-
-  for (int i = 0; i < num_vertical_grid_lines; ++i) {
-    gridPoints[num_horizontal_grid_lines * 2 + i * 2] = {i * grid_width, 0}; // Vertical line start
-    gridPoints[num_horizontal_grid_lines * 2 + i * 2 + 1] = {i * grid_width, screen_height}; // Vertical line end
-  }
-  kGridLines = gridPoints;
+  grid_rectangles = gridRects;
 }
 
 void Renderer::Render(Snake const snake, SDL_Point const &food) {
@@ -67,9 +67,7 @@ void Renderer::Render(Snake const snake, SDL_Point const &food) {
   SDL_RenderClear(sdl_renderer);
 
   // Render the grid
-  SDL_SetRenderDrawColor(sdl_renderer, 0xE8, 0xE8, 0xE8, 0x10);
-  SDL_SetRenderDrawBlendMode(sdl_renderer, SDL_BLENDMODE_BLEND);
-  RenderGrid(sdl_renderer);
+  RenderGrid(sdl_renderer, screen_width, grid_width);
 
   // Render food
   SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
@@ -105,11 +103,18 @@ void Renderer::UpdateWindowTitle(int score, int fps) {
   SDL_SetWindowTitle(sdl_window, title.c_str());
 }
 
-void Renderer::RenderGrid(SDL_Renderer *renderer) {
-  for (int i = 0; i < total_num_grid_lines; i = i + 2) {
-    auto startCoord = *(kGridLines + i);
-    auto endCoord = *(kGridLines + i + 1);
-    std::cout << "Drawing a line from " << i << ": (" << startCoord.x << ", " << startCoord.y << ") to (" << endCoord.x << ", " << endCoord.y << ")" << std::endl;
-    SDL_RenderDrawLine(renderer, startCoord.x, startCoord.y, endCoord.x, endCoord.y);
+void Renderer::RenderGrid(SDL_Renderer *renderer, const int screen_width, const int grid_width) {
+  int columnsInRow = screen_width / grid_width;
+  SDL_SetRenderDrawBlendMode(sdl_renderer, SDL_BLENDMODE_BLEND);
+  bool isEvenRow = true;
+  for (int i = 0; i < total_num_rect_in_grid; i++) {
+    int rowNum = i / columnsInRow;
+    rowNum % 2 == 0 ? isEvenRow = true: isEvenRow = false;
+    if (isEvenRow && i % 2 == 0 || !isEvenRow && i % 2 == 1) {
+      SDL_SetRenderDrawColor(sdl_renderer, 0x47, 0x74, 0x37, 0x40);      
+    } else {
+      SDL_SetRenderDrawColor(sdl_renderer, 0x69, 0xAB, 0x51, 0x40);
+    }
+    SDL_RenderFillRect(sdl_renderer, grid_rectangles + i);
   }
 }

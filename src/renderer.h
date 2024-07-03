@@ -20,17 +20,15 @@ class Renderer {
 
   void InitGrid(const int screen_width, const int screen_height,
            const int grid_width, const int grid_height);
-  void RenderGrid(SDL_Renderer *renderer);
+  void RenderGrid(SDL_Renderer *renderer, const int screen_width, const int grid_width);
 
   const std::size_t screen_width;
   const std::size_t screen_height;
   const std::size_t grid_width;
   const std::size_t grid_height;
 
-  const SDL_Point * kGridLines;
-  const int num_horizontal_grid_lines;
-  const int num_vertical_grid_lines;
-  const int total_num_grid_lines;
+  const SDL_Rect * grid_rectangles;
+  const int total_num_rect_in_grid;
 };
 
 #endif
