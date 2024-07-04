@@ -2,6 +2,10 @@
 #include <cmath>
 #include <iostream>
 
+void Snake::HandleInput(UserInput input) {
+  if (input != UserInput::none && (!IsOpositeDirection(direction, input) || size == 1)) direction = input;
+}
+
 void Snake::Update() {
   SDL_Point prev_cell{
       static_cast<int>(head_x),
@@ -21,19 +25,19 @@ void Snake::Update() {
 
 void Snake::UpdateHead() {
   switch (direction) {
-    case Direction::kUp:
+    case UserInput::up:
       head_y -= speed;
       break;
 
-    case Direction::kDown:
+    case UserInput::down:
       head_y += speed;
       break;
 
-    case Direction::kLeft:
+    case UserInput::left:
       head_x -= speed;
       break;
 
-    case Direction::kRight:
+    case UserInput::right:
       head_x += speed;
       break;
   }
@@ -76,4 +80,20 @@ bool Snake::SnakeCell(int x, int y) {
     }
   }
   return false;
+}
+
+bool Snake::IsOpositeDirection(UserInput previous, UserInput latest) const {
+  switch (previous)
+  {
+  case up:
+    return latest == UserInput::down;
+  case right:
+    return latest == UserInput::left;
+  case down:
+    return latest == UserInput::up;
+  case left:
+    return latest == UserInput::right;
+  default:
+    return false;
+  }
 }

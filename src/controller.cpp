@@ -3,39 +3,25 @@
 #include "SDL.h"
 #include "snake.h"
 
-void Controller::ChangeDirection(Snake &snake, Snake::Direction input,
-                                 Snake::Direction opposite) const {
-  if (snake.direction != opposite || snake.size == 1) snake.direction = input;
-  return;
-}
-
-void Controller::HandleInput(bool &running, Snake &snake) const {
+UserInput Controller::HandleInput() const {
   SDL_Event e;
   while (SDL_PollEvent(&e)) {
     if (e.type == SDL_QUIT) {
-      running = false;
+      return UserInput::quit;
     } else if (e.type == SDL_KEYDOWN) {
       switch (e.key.keysym.sym) {
         case SDLK_UP:
-          ChangeDirection(snake, Snake::Direction::kUp,
-                          Snake::Direction::kDown);
-          break;
-
+          return UserInput::up;
         case SDLK_DOWN:
-          ChangeDirection(snake, Snake::Direction::kDown,
-                          Snake::Direction::kUp);
-          break;
-
+          return UserInput::down;
         case SDLK_LEFT:
-          ChangeDirection(snake, Snake::Direction::kLeft,
-                          Snake::Direction::kRight);
-          break;
-
+          return UserInput::left;
         case SDLK_RIGHT:
-          ChangeDirection(snake, Snake::Direction::kRight,
-                          Snake::Direction::kLeft);
-          break;
+          return UserInput::right;
+        case SDLK_ESCAPE:
+          return UserInput::quit;
       }
     }
   }
+  return UserInput::none;
 }
