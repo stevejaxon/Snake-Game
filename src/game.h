@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <memory>
 #include <random>
 #include "SDL.h"
 #include "controller.h"
@@ -16,7 +17,7 @@ class Game {
   int GetSize() const;
 
  private:
-  Snake snake;
+  std::shared_ptr<Snake> snake;
   SDL_Point food;
 
   std::random_device dev;
