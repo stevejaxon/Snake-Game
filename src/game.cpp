@@ -25,6 +25,10 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   while (running) {
     frame_start = SDL_GetTicks();
 
+    //
+    std::lock_guard<std::mutex> lg(last_tick_mutex);
+    *last_tick = frame_start;
+
     // Input, Update, Render - the main game loop.
     UserInput input = controller.HandleInput();
     if (input == UserInput::quit) {
@@ -33,6 +37,7 @@ void Game::Run(Controller const &controller, Renderer &renderer,
     }
     snake->HandleInput(input);
     Update();
+    last_tick_cv.notify_all();
     renderer.Render(snake, food);
 
     frame_end = SDL_GetTicks();

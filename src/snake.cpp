@@ -7,10 +7,17 @@ void Snake::HandleInput(UserInput input) {
   if (input != UserInput::none && (!IsOpositeDirection(direction, input) || size == 1)) direction = input;
 }
 
+// void Snake::Update(std::mutex& latest_tick_mtx, std::condition_variable last_tick_cv, std::shared_ptr<Uint32> last_tick) {
 void Snake::Update() {
   while (true) {
-    // sleep at every iteration to reduce CPU usage
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    /*std::unique_lock<std::mutex> tick_mtx_lock(latest_tick_mtx);
+    last_tick_cv.wait(tick_mtx_lock);
+
+    if (*last_tick > last_tick_time) {
+        last_tick_time = *last_tick;
+    }
+    tick_mtx_lock.unlock();
+    */
     SDL_Point prev_cell{
         static_cast<int>(head_x),
         static_cast<int>(
@@ -25,6 +32,9 @@ void Snake::Update() {
     if (current_cell.x != prev_cell.x || current_cell.y != prev_cell.y) {
       UpdateBody(current_cell, prev_cell);
     }
+
+    // sleep at every iteration to reduce CPU usage
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 }
 

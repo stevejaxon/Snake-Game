@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <condition_variable>
 #include <memory>
 #include <random>
 #include "SDL.h"
@@ -19,6 +20,9 @@ class Game {
  private:
   std::shared_ptr<Snake> snake;
   SDL_Point food;
+  std::shared_ptr<Uint32> last_tick = std::make_shared<Uint32>(0);
+  std::mutex last_tick_mutex;
+  std::condition_variable last_tick_cv;
 
   std::random_device dev;
   std::mt19937 engine;

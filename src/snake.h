@@ -1,6 +1,9 @@
 #ifndef SNAKE_H
 #define SNAKE_H
 
+#include <condition_variable>
+#include <memory>
+#include <mutex>
 #include <vector>
 #include "SDL.h"
 #include "controller.h"
@@ -16,6 +19,7 @@ class Snake {
 
   void HandleInput(UserInput direction);
 
+  // void Update(std::mutex& latest_tick_mtx, std::condition_variable last_tick_cv, std::shared_ptr<Uint32> last_tick);
   void Update();
 
   void GrowBody();
@@ -37,6 +41,7 @@ class Snake {
   bool growing{false};
   int grid_width;
   int grid_height;
+  Uint32 last_tick_time;
 };
 
 #endif
