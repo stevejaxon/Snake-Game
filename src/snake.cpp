@@ -3,10 +3,6 @@
 #include <thread>
 #include <iostream>
 
-void Snake::HandleInput(UserInput input) {
-  if (input != UserInput::none && (!IsOpositeDirection(direction, input) || size == 1)) direction = input;
-}
-
 void Snake::Update(std::mutex& latest_tick_mtx, std::condition_variable& last_tick_cv, const std::shared_ptr<Uint32> last_tick, std::shared_ptr<UserInput> latest_input) {
   std::unique_lock<std::mutex> tick_mtx_lock(latest_tick_mtx, std::defer_lock);
   while (alive) {
@@ -111,4 +107,8 @@ bool Snake::IsOpositeDirection(UserInput previous, UserInput latest) const {
   default:
     return false;
   }
+}
+
+void Snake::HandleInput(UserInput input) {
+  if (input != UserInput::none && (!IsOpositeDirection(direction, input) || size == 1)) direction = input;
 }
