@@ -7,7 +7,7 @@ void Snake::HandleInput(UserInput input) {
   if (input != UserInput::none && (!IsOpositeDirection(direction, input) || size == 1)) direction = input;
 }
 
-void Snake::Update(std::mutex& latest_tick_mtx, std::condition_variable& last_tick_cv, std::shared_ptr<Uint32> last_tick) {
+void Snake::Update(std::mutex& latest_tick_mtx, std::condition_variable& last_tick_cv, const std::shared_ptr<Uint32> last_tick, std::shared_ptr<UserInput> latest_input) {
   std::unique_lock<std::mutex> tick_mtx_lock(latest_tick_mtx, std::defer_lock);
   while (alive) {
     last_tick_cv.wait(tick_mtx_lock);
@@ -16,13 +16,12 @@ void Snake::Update(std::mutex& latest_tick_mtx, std::condition_variable& last_ti
     if (*last_tick > last_tick_time) {
       last_tick_time = *last_tick;
     } else {
+      // On spurious wakeup, go back to waiting
       continue;
     }
 
-    SDL_Point prev_cell{
-        static_cast<int>(head_x),
-        static_cast<int>(
-            head_y)};  // We first capture the head's cell before updating.
+    SDL_Point prev_cell{static_cast<int>(head_x),static_cast<int>(head_y)};  // We first capture the head's cell before updating.
+    HandleInput(*latest_input);
     UpdateHead();
     SDL_Point current_cell{
         static_cast<int>(head_x),

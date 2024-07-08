@@ -19,7 +19,7 @@ class Snake {
 
   void HandleInput(UserInput direction);
 
-  void Update(std::mutex& latest_tick_mtx, std::condition_variable& last_tick_cv, std::shared_ptr<Uint32> last_tick);
+  void Update(std::mutex& latest_tick_mtx, std::condition_variable& last_tick_cv, const std::shared_ptr<Uint32> last_tick, std::shared_ptr<UserInput> latest_input);
 
   void GrowBody();
   bool SnakeCell(int x, int y);
