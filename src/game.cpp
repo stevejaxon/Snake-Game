@@ -19,15 +19,17 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   Uint32 frame_duration;
   int frame_count = 0;
   bool running = true;
-  std::thread snake_thread = std::thread(&Snake::Update, snake);
+  std::thread snake_thread = std::thread(&Snake::Update, snake, std::ref(last_tick_mutex), std::ref(last_tick_cv), last_tick);
   snake_thread.detach();
 
+  std::unique_lock<std::mutex> lg(last_tick_mutex, std::defer_lock);
   while (running) {
     frame_start = SDL_GetTicks();
 
     //
-    std::lock_guard<std::mutex> lg(last_tick_mutex);
+    lg.lock();
     *last_tick = frame_start;
+    lg.unlock();
 
     // Input, Update, Render - the main game loop.
     UserInput input = controller.HandleInput();
