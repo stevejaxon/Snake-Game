@@ -2,6 +2,8 @@
 #include <iostream>
 #include <thread>
 #include "SDL.h"
+#include "food.h"
+#include "poison.h"
 
 Game::Game(std::size_t grid_width, std::size_t grid_height)
     : engine(dev()),
@@ -22,6 +24,7 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   auto latest_input = std::make_shared<UserInput>(UserInput::none);
   std::thread snake_thread = std::thread(&Snake::Update, snake, std::ref(last_tick_mutex), std::ref(last_tick_cv), last_tick, latest_input);
   snake_thread.detach();
+  auto foo = std::make_shared<std::unordered_map<Location, Interactable>>(objects);
 
   std::unique_lock<std::mutex> lg(last_tick_mutex, std::defer_lock);
   while (running) {
@@ -40,7 +43,7 @@ void Game::Run(Controller const &controller, Renderer &renderer,
     Update();
     // Notify the threads (such as the snake) of the new frame
     last_tick_cv.notify_all();
-    renderer.Render(snake, food);
+    renderer.Render(snake, foo);
 
     frame_end = SDL_GetTicks();
 
@@ -73,8 +76,8 @@ void Game::PlaceFood() {
     // Check that the location is not occupied by a snake item before placing
     // food.
     if (!snake->SnakeCell(x, y)) {
-      food.x = x;
-      food.y = y;
+      Location location{x, y};
+      objects.emplace(location, Food(location));
       return;
     }
   }
@@ -86,13 +89,23 @@ void Game::Update() {
   int new_x = static_cast<int>(snake->head_x);
   int new_y = static_cast<int>(snake->head_y);
 
-  // Check if there's food over here
-  if (food.x == new_x && food.y == new_y) {
-    score++;
-    PlaceFood();
-    // Grow snake and increase speed.
-    snake->GrowBody();
-    snake->speed += 0.02;
+  // Check if there's food in the same grid location as the snake head's new location
+  Location location{new_x, new_y};
+  auto iter = objects.find(location);
+  // location does not exist in the objects map i.e. it is empty
+  if (iter == objects.end()) {
+    return;
+  }
+  Interactable object = iter->second;
+  if (object.edible) {
+    score = score + object.score;
+    objects.erase(iter);
+    if (typeid(object) == typeid(Food)) {
+      // Grow snake and increase speed.
+      snake->GrowBody();
+      snake->speed += 0.02;
+      PlaceFood();
+    }
   }
 }
 
