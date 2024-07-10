@@ -8,6 +8,14 @@
 #include "SDL.h"
 #include "controller.h"
 
+const SDL_Color kSnakeBodyColors[] {
+  SDL_Color{0xFF, 0xFF, 0xFF, 0xFF},
+  SDL_Color{0xc1, 0x04, 0xf0, 0xFF},
+  SDL_Color{0x74, 0x02, 0x90, 0xFF},
+  SDL_Color{0x2a, 0x01, 0x34, 0xFF},
+  SDL_Color{0x06, 0x00, 0x08, 0xFF}
+};
+
 class Snake {
  public:
   Snake(int grid_width, int grid_height)
@@ -27,6 +35,8 @@ class Snake {
   float head_x;
   float head_y;
   std::vector<SDL_Point> body;
+  const int max_poison_ingestion = 4;
+  int amount_of_poison_ingested = 0;
 
  private:
   void UpdateHead();

@@ -99,6 +99,10 @@ void Game::Update() {
       snake->speed += 0.02;
       PlaceFood();
     } else if (object->GetType() == Type::poison) {
+      snake->amount_of_poison_ingested++;
+      if (snake->amount_of_poison_ingested >= snake->max_poison_ingestion) {
+        snake->alive = false;
+      }
       PlacePoison();
     }
   }

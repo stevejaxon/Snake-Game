@@ -79,7 +79,8 @@ void Renderer::Render(std::shared_ptr<Snake> const snake, std::shared_ptr<std::u
   }
 
   // Render snake's body
-  SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+  auto snakeBodyColor = kSnakeBodyColors[snake->amount_of_poison_ingested];
+  SDL_SetRenderDrawColor(sdl_renderer, snakeBodyColor.r, snakeBodyColor.g, snakeBodyColor.b, snakeBodyColor.a);
   for (SDL_Point const &point : snake->body) {
     block.x = point.x * block.w;
     block.y = point.y * block.h;
