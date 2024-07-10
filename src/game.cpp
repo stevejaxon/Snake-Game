@@ -24,8 +24,6 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   auto latest_input = std::make_shared<UserInput>(UserInput::none);
   std::thread snake_thread = std::thread(&Snake::Update, snake, std::ref(last_tick_mutex), std::ref(last_tick_cv), last_tick, latest_input);
   snake_thread.detach();
-  //TODO improve
-  auto foo = std::make_shared<std::unordered_map<Location, std::shared_ptr<Interactable>>>(objects);
 
   std::unique_lock<std::mutex> lg(last_tick_mutex, std::defer_lock);
   while (running) {
@@ -44,7 +42,7 @@ void Game::Run(Controller const &controller, Renderer &renderer,
     Update();
     // Notify the threads (such as the snake) of the new frame
     last_tick_cv.notify_all();
-    renderer.Render(snake, foo);
+    renderer.Render(snake, objects);
 
     frame_end = SDL_GetTicks();
 
@@ -78,7 +76,7 @@ void Game::PlaceFood() {
     // food.
     if (!snake->SnakeCell(x, y)) {
       Location location{x, y};
-      objects.emplace(location, std::make_shared<Food>(location));
+      objects->emplace(location, std::make_shared<Food>(location));
       return;
     }
   }
@@ -92,15 +90,15 @@ void Game::Update() {
 
   // Check if there's food in the same grid location as the snake head's new location
   Location location{new_x, new_y};
-  auto iter = objects.find(location);
+  auto iter = objects->find(location);
   // location does not exist in the objects map i.e. it is empty
-  if (iter == objects.end()) {
+  if (iter == objects->end()) {
     return;
   }
   auto object = iter->second;
   if (object->edible) {
     score = score + object->score;
-    objects.erase(iter);
+    objects->erase(iter);
     if (object->GetType() == Type::food) {
       // Grow snake and increase speed.
       snake->GrowBody();
