@@ -34,7 +34,25 @@ class Game {
   int score{0};
 
   void PlaceFood();
+  void PlacePoison();
   void Update();
+  bool IsLocationOccupied(Location location);
+  template <typename T> void PlaceInteractable(std::mt19937& engine, std::shared_ptr<std::unordered_map<Location, std::shared_ptr<Interactable>>> objects);
 };
+
+template <typename T>
+void Game::PlaceInteractable(std::mt19937& engine, std::shared_ptr<std::unordered_map<Location, std::shared_ptr<Interactable>>> objects) {
+  int x, y;
+  while (true) {
+    x = random_w(engine);
+    y = random_h(engine);
+    // Check that the location is not occupied by a snake item before placing an interactable object.
+    Location location{x, y};
+    if (!IsLocationOccupied(location)) {
+      objects->emplace(location, std::make_shared<T>(location));
+      return;
+    }
+  }
+}
 
 #endif

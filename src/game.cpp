@@ -11,6 +11,7 @@ Game::Game(std::size_t grid_width, std::size_t grid_height)
       random_h(0, static_cast<int>(grid_height - 1)) {
   snake = std::make_shared<Snake>(grid_width, grid_height);
   PlaceFood();
+  PlacePoison();
 }
 
 void Game::Run(Controller const &controller, Renderer &renderer,
@@ -68,18 +69,11 @@ void Game::Run(Controller const &controller, Renderer &renderer,
 }
 
 void Game::PlaceFood() {
-  int x, y;
-  while (true) {
-    x = random_w(engine);
-    y = random_h(engine);
-    // Check that the location is not occupied by a snake item before placing
-    // food.
-    if (!snake->SnakeCell(x, y)) {
-      Location location{x, y};
-      objects->emplace(location, std::make_shared<Food>(location));
-      return;
-    }
-  }
+  PlaceInteractable<Food>(std::ref(engine), objects);
+}
+
+void Game::PlacePoison() {
+  PlaceInteractable<Poison>(std::ref(engine), objects);
 }
 
 void Game::Update() {
@@ -110,3 +104,8 @@ void Game::Update() {
 
 int Game::GetScore() const { return score; }
 int Game::GetSize() const { return snake->size; }
+
+bool Game::IsLocationOccupied(Location location) {
+  auto object = objects->find(location);
+  return (object != objects->end() || snake->SnakeCell(location.x, location.y));
+}
