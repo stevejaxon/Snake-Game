@@ -14,7 +14,7 @@ class Renderer {
            const std::size_t grid_width, const std::size_t grid_height);
   ~Renderer();
 
-  void Render(std::shared_ptr<Snake> const snake, std::shared_ptr<std::unordered_map<Location, Interactable>> const objects);
+  void Render(std::shared_ptr<Snake> const snake, std::shared_ptr<std::unordered_map<Location, std::shared_ptr<Interactable>>> const objects);
   void UpdateWindowTitle(int score, int fps);
 
  private:

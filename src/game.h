@@ -21,7 +21,7 @@ class Game {
 
  private:
   std::shared_ptr<Snake> snake;
-  std::unordered_map<Location, Interactable> objects;
+  std::unordered_map<Location, std::shared_ptr<Interactable>> objects;
   std::shared_ptr<Uint32> last_tick = std::make_shared<Uint32>(0);
   std::mutex last_tick_mutex;
   std::condition_variable last_tick_cv;

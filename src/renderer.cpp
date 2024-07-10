@@ -57,7 +57,7 @@ void Renderer::InitGrid(const int screen_width, const int screen_height,
   grid_rectangles = gridRects;
 }
 
-void Renderer::Render(std::shared_ptr<Snake> const snake, std::shared_ptr<std::unordered_map<Location, Interactable>> const objects) {
+void Renderer::Render(std::shared_ptr<Snake> const snake, std::shared_ptr<std::unordered_map<Location, std::shared_ptr<Interactable>>> const objects) {
   SDL_Rect block;
   block.w = screen_width / grid_width;
   block.h = screen_height / grid_height;
@@ -70,11 +70,11 @@ void Renderer::Render(std::shared_ptr<Snake> const snake, std::shared_ptr<std::u
   RenderGrid(sdl_renderer, screen_width, grid_width);
 
   // Render food
-  for(auto object: (*objects)) {
-    Interactable i = object.second;
-    SDL_SetRenderDrawColor(sdl_renderer, i.color.r, i.color.g, i.color.b, i.color.a);
-    block.x = i.location.x * block.w;
-    block.y = i.location.y * block.h;
+  for(auto object: *objects) {
+    auto interactable = object.second;
+    SDL_SetRenderDrawColor(sdl_renderer, interactable->color.r, interactable->color.g, interactable->color.b, interactable->color.a);
+    block.x = interactable->location.x * block.w;
+    block.y = interactable->location.y * block.h;
     SDL_RenderFillRect(sdl_renderer, &block);
   }
 

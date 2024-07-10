@@ -24,7 +24,8 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   auto latest_input = std::make_shared<UserInput>(UserInput::none);
   std::thread snake_thread = std::thread(&Snake::Update, snake, std::ref(last_tick_mutex), std::ref(last_tick_cv), last_tick, latest_input);
   snake_thread.detach();
-  auto foo = std::make_shared<std::unordered_map<Location, Interactable>>(objects);
+  //TODO improve
+  auto foo = std::make_shared<std::unordered_map<Location, std::shared_ptr<Interactable>>>(objects);
 
   std::unique_lock<std::mutex> lg(last_tick_mutex, std::defer_lock);
   while (running) {
@@ -77,7 +78,7 @@ void Game::PlaceFood() {
     // food.
     if (!snake->SnakeCell(x, y)) {
       Location location{x, y};
-      objects.emplace(location, Food(location));
+      objects.emplace(location, std::make_shared<Food>(location));
       return;
     }
   }
@@ -96,11 +97,11 @@ void Game::Update() {
   if (iter == objects.end()) {
     return;
   }
-  Interactable object = iter->second;
-  if (object.edible) {
-    score = score + object.score;
+  auto object = iter->second;
+  if (object->edible) {
+    score = score + object->score;
     objects.erase(iter);
-    if (typeid(object) == typeid(Food)) {
+    if (object->GetType() == Type::food) {
       // Grow snake and increase speed.
       snake->GrowBody();
       snake->speed += 0.02;
