@@ -98,6 +98,8 @@ void Game::Update() {
       snake->GrowBody();
       snake->speed += 0.02;
       PlaceFood();
+    } else if (object->GetType() == Type::poison) {
+      PlacePoison();
     }
   }
 }
