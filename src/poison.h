@@ -9,7 +9,7 @@ class Poison : public Interactable {
     static constexpr SDL_Color kColor{0x40, 0xFD, 0x14, 0xFF};
     static constexpr int kScore = -1;
 
-    Type GetType() const {
+    Type GetType() const override {
       return Type::poison;
     }
 

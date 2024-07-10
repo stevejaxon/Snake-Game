@@ -9,7 +9,7 @@ class Food : public Interactable {
     static constexpr SDL_Color kColor{0xFF, 0xCC, 0x00, 0xFF};
     static constexpr int kScore = 1;
 
-    Type GetType() const {
+    Type GetType() const override {
       return Type::food;
     }
 
