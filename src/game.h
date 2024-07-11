@@ -36,7 +36,7 @@ class Game {
   void PlaceFood();
   void PlacePoison();
   void Update();
-  bool IsLocationOccupied(Location location);
+  bool IsLocationOccupied(Location &location);
   template <typename T> void PlaceInteractable();
 };
 

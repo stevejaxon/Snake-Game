@@ -24,7 +24,7 @@ class Snake {
         head_x(grid_width / 2),
         head_y(grid_height / 2) {}
 
-  void Update(std::mutex& latest_tick_mtx, std::condition_variable& last_tick_cv, const std::shared_ptr<Uint32> last_tick, std::shared_ptr<UserInput> latest_input);
+  void Update(std::mutex& latest_tick_mtx, std::condition_variable& last_tick_cv, const std::shared_ptr<Uint32> last_tick, const std::shared_ptr<UserInput> latest_input);
 
   void GrowBody();
   bool SnakeCell(int x, int y);
@@ -42,7 +42,7 @@ class Snake {
   void UpdateHead();
   void UpdateBody(SDL_Point &current_cell, SDL_Point &prev_cell);
   bool IsOpositeDirection(UserInput previous, UserInput latest) const;
-  void HandleInput(UserInput direction);
+  void HandleInput(const UserInput direction);
 
   UserInput direction = UserInput::up;
   bool growing{false};

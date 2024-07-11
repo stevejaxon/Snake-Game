@@ -111,7 +111,7 @@ void Game::Update() {
 int Game::GetScore() const { return score; }
 int Game::GetSize() const { return snake->size; }
 
-bool Game::IsLocationOccupied(Location location) {
+bool Game::IsLocationOccupied(Location &location) {
   auto object = objects->find(location);
   return (object != objects->end() || snake->SnakeCell(location.x, location.y));
 }
