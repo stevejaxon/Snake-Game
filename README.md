@@ -81,5 +81,17 @@ All of the classes in the project have been designed this way, the most interest
 * A template `PlaceInteractable` has been introduced to generalize the logic for placing an interactable item (e.g. food or poison). The implementation of this template can be found in game.h lines 43 - 56. 
 * The `Location` class has a template to provide an implementation of a hashing function for the type - based on the logic [in the std::hash documentation](https://en.cppreference.com/w/cpp/utility/hash). The implementation of this template can be found in location.h lines 17 - 25.
 ## Memory Management
+### The project makes use of references in function declarations.
+* The `Snake` classes updated `Update` function uses pass-by-reference for the `std::mutex` and `std::conditional_variable` function arguments. The `std::mutex` can not be copied, and it wouldn't make sense to create a copy of the `std::conditional_variable` argument since the thread is waiting on notify to be called (to inform the snake that a new frame is being created). The updated code can be found on line 6 of snake.cpp.
+* The `Game` classes newly introduced `IsLocationOccupied` function uses pass-by-reference to avoid copying the `Location` function argument. This addition can be found on line 114 of game.cpp.
 ### The project uses destructors appropriately.
 * The `Renderer` class' destructor has been updated to delete the dynamically, heap allocated array `grid_rectangles`. This addition can be found on line 41 of renderer.cpp.
+### The project uses scope / Resource Acquisition Is Initialization (RAII) where appropriate.
+Variables have been scoped as locally as possible througout the project and RAII-compliant standard classes have been leveraged.
+* For example, the `latest_input` variable of type `std::shared_ptr` is scoped to within the `Game`'s `Run` function (found on line 25 of game.cpp). This makes sure that the user's input can be communicated between classes through a pointer, and the destructor is called when the `Run` function terminates. 
+* Another example, is the `lastTickLock` variable of type `std::unique_lock`. This is also scoped to within the `Game`'s `Run` function (found on line 29 of game.cpp). This makes sure that the lock associated with the class' mutex is unlocked when the `Run` function terminates. 
+### The project uses smart pointers instead of raw pointers.
+The project makes use of `std::shared_ptr`s to share data between classes and threads. 
+* The data associated with the `Snake` instance is required both in the `Game` and `Renderer` classes. A `std::shared_ptr` is used pass a pointer to the `Snake` instance to the `Renderer` class.
+* The `Snake` class needs to check what the most recent user input was each frame, and to also check when the last frame occurred to guard against spurious wakeups. This is accomplished using `std::shared_ptr`s to the `Game`-owned `last_tick` and `latest_input` variables. The code for the `Snake`'s input function can be found on lines 6 - 35 of snake.cpp.
+* The `Game`'s map of object locations (`objects` - see line 24 of game.cpp) is needed in both the `Game` and `Renderer` classes. A `std::shared_ptr` is used pass a pointer to the instance `std::unorded_map` to the `Renderer` class. This make sure that the game's view of the world state is being displayed correctly without copying the map or data structures. The design also allows for there to be more objects in the game world in a memory efficient way.
