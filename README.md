@@ -92,6 +92,16 @@ Variables have been scoped as locally as possible througout the project and RAII
 * Another example, is the `lastTickLock` variable of type `std::unique_lock`. This is also scoped to within the `Game`'s `Run` function (found on line 29 of game.cpp). This makes sure that the lock associated with the class' mutex is unlocked when the `Run` function terminates. 
 ### The project uses smart pointers instead of raw pointers.
 The project makes use of `std::shared_ptr`s to share data between classes and threads. 
-* The data associated with the `Snake` instance is required both in the `Game` and `Renderer` classes. A `std::shared_ptr` is used pass a pointer to the `Snake` instance to the `Renderer` class.
+* The data associated with the `Snake` instance is required both in the `Game` and `Renderer` classes. A `std::shared_ptr` is used pass a pointer to the `Snake` instance to the `Renderer` class. This `Snake`'s instance is created and the ownership passed to the Smart Pointer in the `Game`'s constructor (found on line 12 of game.cpp).
 * The `Snake` class needs to check what the most recent user input was each frame, and to also check when the last frame occurred to guard against spurious wakeups. This is accomplished using `std::shared_ptr`s to the `Game`-owned `last_tick` and `latest_input` variables. The code for the `Snake`'s input function can be found on lines 6 - 35 of snake.cpp.
 * The `Game`'s map of object locations (`objects` - see line 24 of game.cpp) is needed in both the `Game` and `Renderer` classes. A `std::shared_ptr` is used pass a pointer to the instance `std::unorded_map` to the `Renderer` class. This make sure that the game's view of the world state is being displayed correctly without copying the map or data structures. The design also allows for there to be more objects in the game world in a memory efficient way.
+## Concurrency
+### The project uses multithreading
+The `Snake` class has been updated to run in its own thread. The `Snake`'s `Update` function has been modified to run in an infinite loop, until one of the loss conditions is reached. 
+The `Snake`'s instance is created and the ownership passed to the Smart Pointer in the `Game`'s constructor (found on line 12 of game.cpp). A thread is then created using the `std::thread` template in the `Game`'s `Run` function (defined on line 26 of game.cpp).
+### A mutex or lock is used in the project.
+A `std::mutex` and a `std::unique_lock` are used in the project (alongside of a `std::condition_variable`) to communicate from the `Game`'s , main, thread to the `Snake`'s thread that a new frame is being created. 
+The `std::mutex` is defined in game.h on line 26. The `std::unique_lock` on the `std::mutex` is created in game.cpp on line 29.
+### A condition variable is used in the project.
+A `std::condition_variable` is used to communicate from the `Game`'s , main, thread to the `Snake`'s thread that a new frame is being created.
+The `std::condition_variable` is defined in game.h on line 27. The `std::condition_variable`'s `wait` function is called in the snake.cpp class on line 9 - as part of the `Snake` class' `Update` function. The `std::condition_variable`'s `notify_all` function is called in game.cpp on line 45 as part of the `Game`'s `Run` function. The `notify_all` function was chosen so that the design could accomodate multiple threads waiting on a tick event e.g. if another snake was introduced to the game or new enemy types were added.
