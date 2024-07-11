@@ -47,6 +47,7 @@ This work is licensed under a
 
 ## Poison
 A new poisoned food type was added to the game. This introduces a new loss condition - when the snake ingests too much poison. Eating the poisoned food also decreases the player's score by 1. However, it does not reduce the length of the snake or decrease the speed of the snake - this means that more skill is required to reach the highest score. 
+The snake changes color each time that it eats one of the poisoned food sources, giving visual feedback to the player.
 
 ## Checkered background
 The background has been changed to a checkered pattern instead of the a plain black background. 
