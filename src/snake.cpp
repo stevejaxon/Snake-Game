@@ -9,7 +9,7 @@ void Snake::Update(std::mutex& latest_tick_mtx, std::condition_variable& last_ti
     last_tick_cv.wait(tick_mtx_lock);
 
     // Check for spurious wakeups
-    if (*last_tick > last_tick_time) {
+    if (*last_tick >= last_tick_time) {
       last_tick_time = *last_tick;
     } else {
       // On spurious wakeup, go back to waiting

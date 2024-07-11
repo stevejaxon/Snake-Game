@@ -48,7 +48,7 @@ class Snake {
   bool growing{false};
   int grid_width;
   int grid_height;
-  Uint32 last_tick_time;
+  Uint32 last_tick_time = 0;
 };
 
 #endif
