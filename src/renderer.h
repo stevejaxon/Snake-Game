@@ -23,7 +23,7 @@ class Renderer {
 
   void InitGrid(const int screen_width, const int screen_height,
            const int grid_width, const int grid_height);
-  void RenderGrid(SDL_Renderer *renderer, const int screen_width, const int grid_width);
+  void RenderGrid(const int screen_width, const int grid_width);
 
   const std::size_t screen_width;
   const std::size_t screen_height;

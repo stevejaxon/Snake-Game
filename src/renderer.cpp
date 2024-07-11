@@ -67,7 +67,7 @@ void Renderer::Render(std::shared_ptr<Snake> const snake, std::shared_ptr<std::u
   SDL_RenderClear(sdl_renderer);
 
   // Render the grid
-  RenderGrid(sdl_renderer, screen_width, grid_width);
+  RenderGrid(screen_width, grid_width);
 
   // Render food
   for(auto object: *objects) {
@@ -107,7 +107,7 @@ void Renderer::UpdateWindowTitle(int score, int fps) {
   SDL_SetWindowTitle(sdl_window, title.c_str());
 }
 
-void Renderer::RenderGrid(SDL_Renderer *renderer, const int screen_width, const int grid_width) {
+void Renderer::RenderGrid(const int screen_width, const int grid_width) {
   int columnsInRow = screen_width / grid_width;
   SDL_SetRenderDrawBlendMode(sdl_renderer, SDL_BLENDMODE_BLEND);
   bool isEvenRow = true;
