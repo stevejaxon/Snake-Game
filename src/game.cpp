@@ -69,11 +69,11 @@ void Game::Run(Controller const &controller, Renderer &renderer,
 }
 
 void Game::PlaceFood() {
-  PlaceInteractable<Food>(std::ref(engine), objects);
+  PlaceInteractable<Food>();
 }
 
 void Game::PlacePoison() {
-  PlaceInteractable<Poison>(std::ref(engine), objects);
+  PlaceInteractable<Poison>();
 }
 
 void Game::Update() {

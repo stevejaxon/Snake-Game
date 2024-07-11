@@ -37,11 +37,11 @@ class Game {
   void PlacePoison();
   void Update();
   bool IsLocationOccupied(Location location);
-  template <typename T> void PlaceInteractable(std::mt19937& engine, std::shared_ptr<std::unordered_map<Location, std::shared_ptr<Interactable>>> objects);
+  template <typename T> void PlaceInteractable();
 };
 
 template <typename T>
-void Game::PlaceInteractable(std::mt19937& engine, std::shared_ptr<std::unordered_map<Location, std::shared_ptr<Interactable>>> objects) {
+void Game::PlaceInteractable() {
   int x, y;
   while (true) {
     x = random_w(engine);
